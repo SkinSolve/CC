@@ -20,5 +20,9 @@
     "url": "https://github.com/SkinSolve/CC/issues"
   },
   "homepage": "https://github.com/SkinSolve/CC#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.9",
+    "@tensorflow/tfjs-node": "^4.20.0"
+  }
 }
