@@ -4,6 +4,13 @@ const Hapi = require('@hapi/hapi');
 const routes = require('..src/server/routes');
 const loadModel = require('../services/loadModel');
 const InputError = require('../exceptions/InputError');
+const admin = require('firebase-admin');
+const serviceAccount = require('./CC/skinsolve-backend/serviceAccountKey.json');
+
+// Inisialisasi Firebase Admin SDK
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 (async () => {
     const server = Hapi.server({
