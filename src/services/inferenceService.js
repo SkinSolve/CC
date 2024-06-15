@@ -13,7 +13,7 @@ async function predictClassification(model, image) {
     const score = await prediction.data();
     const confidenceScore = Math.max(...score) * 100;
 
-    const classes = ['Non-cancer', 'Cancer'];
+    const classes = ['AMBA', 'O D G J'];
 
     const classResult = tf.argMax(prediction, 1).dataSync()[0];
 
