@@ -1,20 +1,14 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
-const routes = require('..src/server/routes');
+const routes = require('./routes');
 const loadModel = require('../services/loadModel');
 const InputError = require('../exceptions/InputError');
-const admin = require('firebase-admin');
-const serviceAccount = require('./CC/skinsolve-backend/serviceAccountKey.json');
-
-// Inisialisasi Firebase Admin SDK
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
+const serviceAccount = require('../key/serviceAccountKey.json');
 
 (async () => {
     const server = Hapi.server({
-        port: process.env.PORT,
+        port: process.env.PORT || 5000,
         host: '0.0.0.0',
         routes: {
             cors: {
