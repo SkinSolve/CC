@@ -24,7 +24,6 @@
   "description": "",
   "dependencies": {
     "@hapi/hapi": "^21.3.9",
-    "@tensorflow/tfjs": "^4.20.0",
     "@tensorflow/tfjs-node": "^1.2.1",
     "dotenv": "^16.4.5",
     "sharp": "^0.33.4"

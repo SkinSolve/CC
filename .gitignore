@@ -1,7 +1,2 @@
 node_modules/
 .env
-serviceAccountKey.json
-pnpm-lock.yaml
-*.jpeg
-*.png
-nauval.test
