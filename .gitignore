@@ -1,7 +1,11 @@
 node_modules/
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 .env
 serviceAccountKey.json
 .env.example
 >>>>>>> Stashed changes
+=======
+package-lock.json
+>>>>>>> aefb4727797a375be1552a526a922a643487284c
