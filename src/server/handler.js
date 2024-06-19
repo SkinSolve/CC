@@ -1,43 +1,86 @@
-const predictClassification = require('../services/inferenceService');
+const { predictAcne } = require('../services/inferenceAcne');
+const { predictRedness } = require('../services/inferenceRedness');
+const { predictSkinType } = require('../services/inferenceSkinType');
 const crypto = require('crypto');
 const { storeData, storeGetAll } = require("../services/storeData");
 
 async function postPredictHandler(request, h) {
-  const { image } = request.payload;
+  const { image, feature } = request.payload;
   const { model } = request.server.app;
 
-  const { confidenceScore, label, suggestion } = await predictClassification(model, image);
-  const id = crypto.randomUUID();
-  const createdAt = new Date().toISOString();
+  let result;
 
-  const data = {
-    "id": id,
-    "result": label,
-    "suggestion": suggestion,
-    "confidenceScore": confidenceScore,
-    "createdAt": createdAt
-  }
+  try {
+    switch (feature){
+      case 'acne':
+        result = await predictAcne(model, image);
+        break;
+      case 'redness':
+        result = await predictRedness(model, image);
+        break;
+      case 'skintype':
+        result = await predictSkinType(model, image);
+        break;
+      default:
+        return h.response({
+          status: 'error',
+          message: 'Invalid feature specified'
+        }).code(400);
+    }
+   
+    const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+
+    // Prepare data for storage
+    const data = {
+      "id": id,
+      "result": result.label,
+      "suggestion": result.suggestion,
+      "confidenceScore": result.confidenceScore,
+      "createdAt": createdAt
+    };
 
   await storeData(id,data);
 
   const response = h.response({
     status: 'success',
-    message: confidenceScore > 99 ? 'Model is predicted successfully' : 'Model is predicted successfully but under threshold. Please use the correct picture',
+    message: 'Models are predicted successfully',
     data
-  })
+  });
   response.code(201);
   return response;
+  } catch (error) {
+    console.error('Error in prediction:', error);
+    const response = h.response({
+      status: 'error',
+      message: 'Failed to predict models',
+      error: error.message
+    });
+    response.code(500);
+    return response;
+  }
 }
 
 async function getPredictHistories(request, h) {
-  const histories = await storeGetAll();
+  try {
+    const histories = await storeGetAll();
 
-  const response = h.response({
-    status: "success",
-    data: histories,
-  });
-  response.code(200);
-  return response;
+    const response = h.response({
+      status: 'success',
+      data: histories
+    });
+    response.code(200);
+    return response;
+  } catch (error) {
+    console.error('Error fetching histories:', error);
+    const response = h.response({
+      status: 'error',
+      message: 'Failed to fetch prediction histories',
+      error: error.message
+    });
+    response.code(500);
+    return response;
+  }
 }
 
 module.exports = {

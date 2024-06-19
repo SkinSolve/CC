@@ -1,51 +1,40 @@
 require('dotenv').config();
 
-const Hapi = require('@hapi/hapi');
+const express = require('express');
 const routes = require('./routes');
 const loadModel = require('../services/loadModel');
 const InputError = require('../exceptions/InputError');
 const serviceAccount = require('../key/serviceAccountKey.json');
 
-(async () => {
-    const server = Hapi.server({
-        port: process.env.PORT || 5000,
-        host: '0.0.0.0',
-        routes: {
-            cors: {
-              origin: ['*'],
-            },
-        },
-    });
+const app = express();
+const port = process.env.PORT || 5000;
 
-    const model = await loadModel();
-    server.app.model = model;
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-    server.route(routes);
+const init = async () => {
+    try {
+        const model = await loadModel();
+        app.locals.model = model;
 
-    server.ext('onPreResponse', function (request, h) {
-        const response = request.response;
+        app.use('/', routes);
 
-        if (response instanceof InputError) {
-            const newResponse = h.response({
-                status: 'fail',
-                message: `${response.message}`
-            })
-            newResponse.code(response.statusCode)
-            return newResponse;
-        }
+        app.use((err, req, res, next) => {
+            if (err instanceof InputError) {
+                return res.status(err.statusCode).json({ status: 'fail', message: err.message });
+            }
+            if (err.isBoom) {
+                return res.status(err.output.statusCode).json({ status: 'fail', message: err.message });
+            }
+            return res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+        });
 
-        if (response.isBoom) {
-            const newResponse = h.response({
-                status: 'fail',
-                message: response.message
-            })
-            newResponse.code(response.output.statusCode)
-            return newResponse;
-        }
+        app.listen(port, () => {
+            console.log(`Server running on http://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to initialize server:', error);
+    }
+};
 
-        return h.continue;
-    });
-
-    await server.start();
-    console.log(`Server start at: ${server.info.uri}`);
-})();
+init();
