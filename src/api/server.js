@@ -1,17 +1,16 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const app = express();
 
 
 async function startServer() {
-// Use json request and cors handler
-app.use(bodyParser.json());
+// Use cors handler
 app.use(cors());
 // Use morgan dev logging
 app.use(morgan('dev'));
 
+app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
