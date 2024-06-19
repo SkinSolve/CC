@@ -1,36 +1,36 @@
 const tf = require('@tensorflow/tfjs-node');
+const { createCanvas, loadImage } = require('canvas');
 const InputError = require('../exceptions/InputError');
 
 async function predictAcne(model, image) {
     try {
-        const tensor = tf.node
-            .decodeJpeg(image)
-            .resizeNearestNeighbor([224, 224])
-            .expandDims()
-            .toFloat();
-
+        const canvas = createCanvas(150, 150);
+        const ctx = canvas.getContext('2d');
+        const img = await loadImage(image);
+        ctx.drawImage(img, 0, 0, 150, 150);
+        const tensor = tf.browser.fromPixels(canvas).expandDims();
+        
+        // Make prediction
         const prediction = model.predict(tensor);
-        const score = await prediction.data();
-        const confidenceScore = Math.max(...score) * 100;
+        const scores = await prediction.data();
+        
+        // Adjusted prediction logic based on the notebook
+        const predictionScore = scores[1]; // Assuming index 1 corresponds to 'Acne' class
 
+        const confidenceScore = predictionScore * 100;
+        const predictedClassIdx = predictionScore > 0.5 ? 1 : 0;
+
+        // Define classes
         const classes = ['No Acne', 'Acne'];
 
-        const classResult = tf.argMax(prediction, 1).dataSync()[0];
-
-        let label;
-        let suggestion;
-
-        if (classResult === 1) {
-            label = classes[1];
-            suggestion = "Wajah anda terindikasi berjerawat, segera lakukan perawatan wajah";
-        } else {
-            label = classes[0];
-            suggestion = "Kulit wajah anda sehat!";
-        }
+        const label = classes[predictedClassIdx];
+        const suggestion = predictedClassIdx === 1 ?
+            "Wajah anda terindikasi berjerawat, segera lakukan perawatan wajah" :
+            "Kulit wajah anda sehat!";
 
         return { confidenceScore, label, suggestion };
     } catch (error) {
-        throw new InputError(`Terjadi kesalahan dalam melakukan prediksi acne`);
+        throw new InputError(`Error predicting acne: ${error.message}`);
     }
 }
 

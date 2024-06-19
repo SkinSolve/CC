@@ -5,32 +5,29 @@ async function predictRedness(model, image) {
     try {
         const tensor = tf.node
             .decodeJpeg(image)
-            .resizeNearestNeighbor([224, 224])
+            .resizeNearestNeighbor([150, 150]) // Adjust according to the model's input size
             .expandDims()
             .toFloat();
 
         const prediction = model.predict(tensor);
-        const score = await prediction.data();
-        const confidenceScore = Math.max(...score) * 100;
+        const scores = await prediction.data();
+        
+        // Adjusted prediction logic based on the notebook
+        const predictionScore = scores[1];  // Assuming index 1 corresponds to 'Redness' class
+
+        const confidenceScore = predictionScore * 100;
+        const predictedClassIdx = predictionScore > 0.5 ? 1 : 0;
 
         const classes = ['No Redness', 'Redness'];
 
-        const classResult = tf.argMax(prediction, 1).dataSync()[0];
-
-        let label;
-        let suggestion;
-
-        if (classResult === 1) {
-            label = classes[1];
-            suggestion = "Segera konsultasikan ke dokter kulit!";
-        } else {
-            label = classes[0];
-            suggestion = "Anda tidak mengalami kemerahan pada kulit.";
-        }
+        const label = classes[predictedClassIdx];
+        const suggestion = predictedClassIdx === 1 ?
+            "Kulit anda mengalami kemerahan, segera konsultasikan ke dokter kulit!" :
+            "Anda tidak mengalami kemerahan pada kulit.";
 
         return { confidenceScore, label, suggestion };
     } catch (error) {
-        throw new InputError(`Terjadi kesalahan dalam melakukan prediksi redness`);
+        throw new InputError(`Error predicting redness: ${error.message}`);
     }
 }
 
