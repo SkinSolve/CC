@@ -23,7 +23,6 @@
   "homepage": "https://github.com/SkinSolve/CC#readme",
   "description": "",
   "dependencies": {
-    "@tensorflow/tfjs": "^4.8.0",
     "@tensorflow/tfjs-node": "^4.20.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
