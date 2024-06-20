@@ -31,11 +31,6 @@ async function storeGetAll() {
   });
   return histories;
 }
-const {
-  getPredictionById: storeGetById,
-  storeData,
-  storeGetAll,
-} = require("./storeData");
 
 module.exports = {
   storeData,
