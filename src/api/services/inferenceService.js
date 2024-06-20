@@ -26,9 +26,9 @@ async function predictClassification(image) {
     const rednessClasses = ["Tidak Kemerahan", "Kemerahan"];
     const skintypeClasses = ["Tidak Berminyak", "Berminyak"];
 
-    let acneLabel = acneClasses[tf.argMax(prediction, 1).dataSync()[0]];
-    let rednessLabel = rednessClasses[tf.argMax(prediction, 1).dataSync()[0]];
-    let skintypeLabel = skintypeClasses[tf.argMax(prediction, 1).dataSync()[0]];
+    let acneLabel = acneClasses[tf.argMax(acnePrediction, 1).dataSync()[0]];
+    let rednessLabel = rednessClasses[tf.argMax(rednessPrediction, 1).dataSync()[0]];
+    let skintypeLabel = skintypeClasses[tf.argMax(skintypePrediction, 1).dataSync()[0]];
 
     // Double check
     if (acneScore <= 50) {
