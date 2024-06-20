@@ -10,7 +10,7 @@ const {
 router.get("/", getPredictHistories);
 
 // get spesific predict histories
-router.get("/predict/:id", getPredictionById);
+router.get("/:id", getPredictionById);
 
 // Set up multer for file upload handling
 const storage = multer.memoryStorage();
