@@ -14,9 +14,9 @@ async function predictClassification(image) {
     const model = await loadModel();
 
     // start predictions
-    const acnePrediction = (await model.acne).predict(tensor).data();
-    const rednessPrediction = (await model.redness).predict(tensor).data();
-    const skintypePrediction = (await model.skintype).predict(tensor).data();
+    const acnePrediction = (await model.acne.predict(tensor)).data();
+    const rednessPrediction = (await model.redness.predict(tensor)).data();
+    const skintypePrediction = (await model.skintype.predict(tensor)).data();
     const acneScore = Math.max(...acnePrediction) * 100;
     const rednessScore = Math.max(...rednessPrediction) * 100;
     const skintypeScore = Math.max(...skintypePrediction) * 100;
