@@ -1,54 +1,112 @@
 const predictClassification = require("./inferenceService");
 const crypto = require("crypto");
-const { storeData, storeGetAll } = require("./storeData");
+const { storeGetById, storeData, storeGetAll } = require("./storeData");
+
+async function getPredictionById(req, res) {
+  const { id } = req.params;
+
+  try {
+    const prediction = await storeGetById(id);
+
+    if (!prediction) {
+      return res.status(404).json({
+        status: "error",
+        message: "Prediction not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      data: prediction,
+    });
+  } catch (error) {
+    console.error(`Error while getting prediction by ID: ${error.message}`);
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while fetching prediction",
+    });
+  }
+}
 
 async function postPredictHandler(req, res) {
-  const { image } = req.body;
-  const {
-    acneScore,
-    rednessScore,
-    skintypeScore,
-    acneLabel,
-    rednessLabel,
-    skintypeLabel,
-    acneSuggestion,
-    rednessSuggestion,
-    skintypeSuggestion,
-  } = await predictClassification(image);
+  try {
+    // Assuming multer stores the uploaded file in req.file
+    const image = req.file;
 
-  const id = crypto.randomUUID();
-  const createdAt = new Date().toISOString();
+    if (!image) {
+      return res.status(400).json({
+        status: "error",
+        message: "Image is required",
+      });
+    }
 
-  const data = {
-    id: id,
-    result: {
-      acne: acneLabel,
-      redness: rednessLabel,
-      skintype: skintypeLabel,
-    },
-    suggestion: {
-      acne: acneSuggestion,
-      redness: rednessSuggestion,
-      skintype: skintypeSuggestion,
-    },
-    confidenceScore: {
-      acne: acneScore,
-      redness: rednessScore,
-      skintype: skintypeScore,
-    },
-    createdAt: createdAt,
-  };
+    const {
+      acneScore,
+      rednessScore,
+      skintypeScore,
+      acneLabel,
+      rednessLabel,
+      skintypeLabel,
+      acneSuggestion,
+      rednessSuggestion,
+      skintypeSuggestion,
+    } = await predictClassification(image.buffer); // Assuming predictClassification takes image buffer
 
-  await storeData(id, data);
+    const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
 
-  let response;
-  return response;
+    const data = {
+      id: id,
+      result: {
+        acne: acneLabel,
+        redness: rednessLabel,
+        skintype: skintypeLabel,
+      },
+      suggestion: {
+        acne: acneSuggestion,
+        redness: rednessSuggestion,
+        skintype: skintypeSuggestion,
+      },
+      confidenceScore: {
+        acne: acneScore,
+        redness: rednessScore,
+        skintype: skintypeScore,
+      },
+      createdAt: createdAt,
+    };
+
+    await storeData(id, data);
+
+    return res.status(201).json({
+      status: "success",
+      message: "Model is predicted successfully",
+      data,
+    });
+  } catch (error) {
+    console.error(
+      `Error while processing the image prediction: ${error.message}`
+    );
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while processing the image prediction",
+    });
+  }
 }
 
 async function getPredictHistories(req, res) {
-  const histories = await storeGetAll();
-  let response;
-  return response;
+  try {
+    const histories = await storeGetAll();
+    return res.status(200).json({
+      status: "success",
+      data: histories,
+    });
+  } catch (error) {
+    console.error(`Error while getting prediction histories: ${error.message}`);
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while fetching prediction histories",
+    });
+  }
 }
 
-module.exports = postPredictHandler;
+module.exports = { getPredictionById, postPredictHandler, getPredictHistories };

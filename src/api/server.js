@@ -27,13 +27,17 @@ async function startServer() {
 
   const port = process.env.PORT || 3000;
 
-  /* Error handler middleware */
+  // Error handling middleware for multer file size limit
   app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    console.error(err.message, err.stack);
-    res.status(statusCode).json({ message: err.message });
-    return;
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({
+        status: "error",
+        message: "File size exceeds the 5 MB limit",
+      });
+    }
+    next(err);
   });
+
   app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);
   });
