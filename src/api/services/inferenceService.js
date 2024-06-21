@@ -14,21 +14,27 @@ async function predictClassification(image) {
     const model = await loadModel();
 
     // start predictions
-    const acnePrediction = (await model.acne.predict(tensor)).data();
-    const rednessPrediction = (await model.redness.predict(tensor)).data();
-    const skintypePrediction = (await model.skintype.predict(tensor)).data();
-    const acneScore = Math.max(...acnePrediction) * 100;
-    const rednessScore = Math.max(...rednessPrediction) * 100;
-    const skintypeScore = Math.max(...skintypePrediction) * 100;
+    const acnePrediction = await model.acne.predict(tensor);
+    const rednessPrediction = await model.redness.predict(tensor);
+    const skintypePrediction = await model.skintype.predict(tensor);
+
+    // set score
+    const confidenceAcne = acnePrediction.dataSync()[0];
+    const confidenceRedness = rednessPrediction.dataSync()[0];
+    const confidenceSkintype = skintypePrediction.dataSync()[0];
+    const acneScore = confidenceAcne * 100;
+    const rednessScore = confidenceRedness * 100;
+    const skintypeScore = confidenceSkintype * 100;
 
     // classification
     const acneClasses = ["Tidak Berjerawat", "Berjerawat"];
     const rednessClasses = ["Tidak Kemerahan", "Kemerahan"];
     const skintypeClasses = ["Tidak Berminyak", "Berminyak"];
 
-    let acneLabel = acneClasses[tf.argMax(acnePrediction, 1).dataSync()[0]];
-    let rednessLabel = rednessClasses[tf.argMax(rednessPrediction, 1).dataSync()[0]];
-    let skintypeLabel = skintypeClasses[tf.argMax(skintypePrediction, 1).dataSync()[0]];
+    // we do that everyone has it
+    let acneLabel = "Berjerawat";
+    let rednessLabel = "Kemerahan";
+    let skintypeLabel = "Berminyak";
 
     // Double check
     if (acneScore <= 50) {
