@@ -11,11 +11,15 @@ To run locally
 
 1. install all npm dependency using
    
-```npm install```
+```
+npm install
+```
 
 2. To start run the server run this command in terminal
 
-```nodemon index.js```
+```
+nodemon index.js
+```
 
 ##Testing the API
 
