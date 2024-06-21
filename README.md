@@ -10,9 +10,11 @@ SkinSolve is an application developed as part of the 2024 project by Bangkit Aca
 To run locally
 
 1. install all npm dependency using
+   
 `npm install`
 
-To start run the server run this command in terminal
+2. To start run the server run this command in terminal
+
 `nodemon index.js`
 
 ##Testing the API
