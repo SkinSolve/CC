@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const mongoose = require('mongoose');
+const profileRouter = require('./routes/profile');
 const predictRouter = require("./routes/predict");
 
 async function startServer() {
@@ -16,14 +18,25 @@ async function startServer() {
 
   // Use cors handler
   app.use(cors());
+
   // Use morgan dev logging
   app.use(morgan("dev"));
+
+  // Setup MongoDB connection
+  mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Could not connect to MongoDB', err));
 
   // Welcome API page
   app.get("/", (req, res) => {
     res.json("Welcome to SkinSolve API!");
   });
 
+  app.use('/profile', profileRouter);
   app.use("/predict", predictRouter);
 
   const port = process.env.PORT || 3000;

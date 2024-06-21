@@ -6,6 +6,7 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  skintype: { type: String, default: 'normal' } // Contoh properti tambahan
   // Tambahan properti lain sesuai kebutuhan aplikasi Anda
 });
 

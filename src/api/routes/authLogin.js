@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Pastikan path ini sesuai dengan struktur folder Anda
+const User = require('../models/user'); // Pastikan path ini sesuai dengan struktur folder Anda
 
 // Endpoint untuk login
 router.post('/login', async (req, res) => {
