@@ -6,7 +6,7 @@ SkinSolve is an application developed as part of the 2024 project by Bangkit Aca
 - Share stories and experiences related to skincare routines.
 - And many more features that we continue to develop.
 
-###To run locally
+### To run locally
 
 1. install all npm dependency using
    
@@ -20,7 +20,7 @@ npm install
 nodemon index.js
 ```
 
-###Testing the API
+### Testing the API
 
 The server is already running locally on port 3000 , and you can now test the API using the provided URL. Follow these steps to test the API:
 1. Launch your preferred API testing tool, such as Postman or any other application that allows you to make HTTP requests.
