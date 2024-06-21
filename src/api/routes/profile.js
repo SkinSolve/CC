@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const User = require('../../models/user');
 const verifyToken = require('../middleware/authMiddleware');
 
 // Middleware untuk verifikasi token JWT, diterapkan ke semua rute /profile
